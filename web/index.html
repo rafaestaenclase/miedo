@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Bahiana&display=swap" rel="stylesheet">
+
+<style>
+* {
+    font-family: 'Bahiana', cursive;
+    color: white;
+    text-shadow: -1px -1px 20px #000, 1px -1px 20px #000, -1px 1px 0 #000, 1px 1px 20px #000;
+    font-size: 5vw;
+    padding: 0;
+    margin: 0;
+}
+</style>
+
+
+<style>
+    /* General */
+    body {
+        margin: 0;
+        font-family: 'Courier New', Courier, monospace;
+        background: #0b0b0b url('https://www.istockphoto.com/photos/satanic-ritual') no-repeat center center fixed;
+        background-size: cover;
+        color: #f2f2f2;
+        overflow: hidden;
+    }
+
+    #video-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* adapta el video */
+      z-index: -1; /* detrás del contenido */
+    }
+
+    h1, h2 {
+        text-align: center;
+        text-shadow: 2px 2px 5px #000;
+    }
+    /* Portal */
+    #portal {
+        z-index: 1;
+        margin: 0 auto;
+        margin-top: 40vh;
+        transform: translateY(-50%);
+        width: 90%;
+        padding: 20px;
+        text-align: center;
+    }
+    input, button {
+        font-size: 17vw;
+        margin: 10px 5px;
+        border-radius: 5px;
+        border: none;
+        outline: none;
+    }
+
+    input {
+        width: 100%;
+        background: none;
+        color: white;
+        border-radius: 6px; /* bordes redondeados */
+        text-align: center;
+        caret-color: transparent;
+    }
+
+    button {
+        background: #660000;
+        color: #fff;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover {
+        background: #990000;
+    }
+    .hidden {
+        display: none;
+    }
+    /* Videos */
+    #videoModal {
+        position: fixed;
+        top:0; left:0; width:100vw; height:100vh;
+        background: rgba(0,0,0,1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        display: none;
+    }
+
+    #videoPlayer {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .life {
+        filter: drop-shadow(0 0 8px white) drop-shadow(0 0 12px white);
+    }
+
+
+
+    @keyframes vibrate {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-5px); }
+      40% { transform: translateX(5px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+      100% { transform: translateX(0); }
+    }
+
+    .correct {
+        color: #00ff00 !important;
+        animation: vibrate 0.3s;
+    }
+
+    .incorrect {
+        color: #ff0000 !important;
+        animation: vibrate 0.3s;
+    }
+
+</style>
+</head>
+<body>
+<video id="video-bg" autoplay loop playsinline>
+    <source src="./backgrounds/intro.mp4" type="video/mp4">
+</video>
+<div id="lives" style="
+    position: fixed;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 2000;
+">
+    <img class="life" src="./img/corazonRojo.png" width="50" height="50">
+    <img class="life" src="./img/corazonRojo.png" width="50" height="50">
+    <img class="life" src="./img/corazonRojo.png" width="50" height="50">
+</div>
+<div id="portal">
+    <p id="instructions"></p>
+    <input type="text" id="codeInput" placeholder="" spellcheck="false" autocomplete="off" autofocus>
+    <button id="submitBtn" class="hidden">Enviar</button> <!-- botón oculto -->
+    <p id="feedback"></p>
+</div>
+
+<div id="videoModal"> 
+    <video id="videoPlayer"></video> 
+</div>
+
+
+
+<script>
+    // 🔄 Definición del flujo (simple de ordenar)
+    const steps = [
+        { type: "password", code: "invocar", background: "./backgrounds/intro.mp4"},
+
+        { type: "password", code: "invocar", background: "./backgrounds/intro.mp4"},
+
+        { type: "video", src: "./videos/invocar.mp4" },
+        { type: "password", code: "jeff the killer", background: "./backgrounds/asesinos.mp4"},
+
+        { type: "video", src: "./videos/qr.mp4" },
+        { type: "password", code: "34", background: "./backgrounds/qr.mp4"},
+
+        //EXPLICAR BICHO
+
+        { type: "video", src: "./videos/interferencia.mp4" },
+        { type: "password", code: "34", background: "./backgrounds/yoigo.mp4", jumpscares: [42000, 142000]},
+
+        { type: "video", src: "./videos/interferencia.mp4" },
+        { type: "video", src: "./videos/introAdivinanzas.mp4" },
+        { type: "password", code: "ataúd", background: "./backgrounds/adivinanza1.mp4", jumpscares: [37000]},
+        { type: "password", code: "cementerio", background: "./backgrounds/adivinanza2.mp4"},
+        { type: "password", code: "fuego", background: "./backgrounds/adivinanza3.mp4", jumpscares: [10000]},
+
+        { type: "video", src: "./videos/interferencia.mp4" },
+        { type: "video", src: "./videos/cheff.mp4" },
+        { type: "password", code: "34", background: "./backgrounds/cheff.mp4", jumpscares: [150000]},
+
+        { type: "video", src: "./videos/enhorabuena.mp4"},
+
+        { type: "password", code: "ganzua", background: "./backgrounds/ganzua.mp4", jumpscares: [62000]},
+
+        { type: "password", code: "fin", background: "./backgrounds/poema.mp4"},
+
+        { type: "video", src: "./videos/final.mp4" },
+
+    ];
+
+    let currentStep = 0;
+
+    // Referencias DOM
+    const input = document.getElementById('codeInput');
+    const btn = document.getElementById('submitBtn');
+    const feedback = document.getElementById('feedback');
+    const instructions = document.getElementById('instructions');
+    const videoModal = document.getElementById('videoModal');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const videoBg = document.getElementById('video-bg');
+
+    // Sonidos
+    const soundWrong = new Audio("sounds/wrong.mp3");
+    soundWrong.preload = "auto";
+
+    const bloodSounds = [
+        new Audio("sounds/key (1).mp3"),
+        new Audio("sounds/key (2).mp3"),
+        new Audio("sounds/key (3).mp3")
+    ];
+    bloodSounds.forEach(s => s.preload = "auto");
+
+    // Música de fondo
+    const musicFiles = [
+        "./music/0.mp3",
+        "./music/1.mp3",
+        "./music/2.mp3",
+        "./music/3.mp3"
+    ];
+    const bgMusic = new Audio();
+    bgMusic.loop = true;
+    bgMusic.volume = 0.4;
+    bgMusic.preload = "auto";
+
+    let musicStarted = false; // Control para iniciar música tras primera interacción
+
+    let activeJumpscares = [];
+
+    function playRandomMusic() {
+        const randomIndex = Math.floor(Math.random() * musicFiles.length);
+        bgMusic.src = musicFiles[randomIndex];
+        bgMusic.currentTime = 0;
+        bgMusic.play().catch(err => console.warn('bgMusic play:', err));
+    }
+
+    // Sistema de vidas
+    let lives = 3;
+    const lifeEls = document.querySelectorAll('#lives .life');
+    const redHeart = "./img/corazonRojo.png";
+    const blackHeart = "./img/corazonNegro.png";
+
+    function loseLife() {
+        if (lives > 0) {
+            const index = 3 - lives;
+            lifeEls[index].src = blackHeart; // cambia imagen a negro
+            lives--;
+            if (lives === 0) gameOver();
+        }
+    }
+
+    function gameOver() {
+        input.value = "";
+        instructions.textContent = "💀 Has perdido la partida";
+        bgMusic.pause();
+
+        // Activar reinicio con un solo click
+        function restartOnR(e) {
+            if (input.value.toLowerCase() === "r") {
+                resetGame();
+                input.removeEventListener("input", restartOnR); // 👈 elimina el listener
+                input.value = ""; // opcional, limpia la r
+            }
+        }
+
+        input.addEventListener("input", restartOnR); 
+    }
+
+    function resetGame() {
+        // Reiniciar vidas
+        lives = 3;
+        lifeEls.forEach(life => life.src = redHeart);
+
+        // Reiniciar estado del juego
+        input.style.display = "block";
+        input.value = "";
+        feedback.textContent = "";
+        instructions.textContent = "";
+
+        // Reanudar música
+        if (musicStarted) playRandomMusic();
+
+        // Empezar de nuevo
+        startStep();
+    }
+
+    // 🎬 Iniciar primer paso
+    startStep();
+
+    // ---- SISTEMA NUEVO ----
+    function startStep() {
+        clearJumpscares(); // 🔥 eliminar todos los jumpscares anteriores
+        bgMusic.pause();
+        videoBg.pause();
+
+
+        const step = steps[currentStep];
+        if (!step) return;
+
+        if (step.background) changeBackgroundVideo(step.background);
+
+        if (step.type === "video") playVideo(step.src);
+        else if (step.type === "password") showPasswordStep(step.code);
+    }
+
+    // ▶ Reproducir video
+    function playVideo(src) {
+      input.style.display = "none";
+      feedback.textContent = "";
+
+      bgMusic.pause();
+      videoBg.pause();
+      // Detener música al reproducir video
+      if (musicStarted) bgMusic.pause();
+
+        // 👇 Ocultar vidas mientras el vídeo está activo
+        document.getElementById("lives").style.display = "none";
+
+
+      videoModal.style.display = 'flex';
+      videoPlayer.src = src;
+      videoPlayer.currentTime = 0;
+      videoPlayer.load();
+      videoPlayer.play().catch(err => console.warn('playVideo:', err));
+
+      videoPlayer.onended = () => {
+        videoModal.style.display = 'none';
+
+        // Si es el último paso (último video), redirigir
+        if (currentStep === steps.length - 1) {
+            window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"; // <- tu video de YouTube
+            return;
+        }
+
+        currentStep++;
+        startStep();
+
+        // 👇 Volver a mostrar vidas cuando termina el vídeo
+        document.getElementById("lives").style.display = "flex";
+
+        // Reanudar música tras vídeo
+        if (musicStarted) playRandomMusic();
+      };
+    }
+
+    function normalizeString(str) {
+        return str
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, "")
+            .toLowerCase();
+    }
+
+    // 🔑 Mostrar input de contraseña
+    function showPasswordStep(correctCode) {
+      input.value = "";
+      input.style.display = "block";
+      input.focus();
+      feedback.textContent = "";
+
+      btn.onclick = null;
+      btn.onclick = () => {
+        const userCode = input.value.trim().toUpperCase();
+        input.classList.remove("correct", "incorrect");
+
+        if (normalizeString(userCode) === normalizeString(correctCode)) {
+          input.classList.add("correct");
+          setTimeout(() => {
+            input.value = "";
+            input.classList.remove("correct", "incorrect");
+            currentStep++;
+            startStep();
+          }, 500);
+        } else {
+          feedback.textContent = "INCORRECTO";
+          input.classList.add("incorrect");
+          soundWrong.currentTime = 0;
+          soundWrong.play();
+          loseLife();
+          setTimeout(() => {
+            feedback.textContent = "";
+            input.classList.remove("incorrect");
+          }, 1500);
+        }
+      };
+    }
+
+
+
+    let jumpscareTimeout;
+    let jumpscareActive = false;
+
+
+    function startJumpscare(step, time) {
+        if (!step.background) return;
+
+        let jumpscareStillActive = true; // Control de si el jumpscare sigue activo
+
+        const timeoutId = setTimeout(() => {
+            if (!jumpscareStillActive) return; // si ya se cerró, no hacer nada
+
+            // Crear jumpscare modal
+            const jsModal = document.createElement("div");
+            jsModal.id = "jumpscareModal";
+            jsModal.style.position = "fixed";
+            jsModal.style.top = "0";
+            jsModal.style.left = "0";
+            jsModal.style.width = "100vw";
+            jsModal.style.height = "100vh";
+            jsModal.style.background = "rgba(0,0,0,1)";
+            jsModal.style.display = "flex";
+            jsModal.style.alignItems = "center";
+            jsModal.style.justifyContent = "center";
+            jsModal.style.zIndex = "3000";
+            document.body.appendChild(jsModal);
+
+            const jsVideo = document.createElement("video");
+            jsVideo.src = "./backgrounds/bicho.mp4";
+            jsVideo.style.width = "100%";
+            jsVideo.style.height = "100%";
+            jsVideo.style.objectFit = "cover";
+            jsVideo.autoplay = true;
+            jsVideo.muted = false;
+            jsModal.appendChild(jsVideo);
+
+            // Timer para cerrar jumpscare automáticamente
+            const jsTimer = setTimeout(() => closeJumpscare(true), 8000);
+
+            function handleKey(e) {
+                if (e.code === "Space") closeJumpscare(false);
+            }
+
+            document.addEventListener("keydown", handleKey);
+
+            function closeJumpscare(penalize) {
+                if (!jumpscareStillActive) return; // evitar doble penalización
+                jumpscareStillActive = false; // ya no está activo
+
+                document.removeEventListener("keydown", handleKey);
+                clearTimeout(jsTimer);
+                jsModal.remove();
+
+                if (penalize) {
+                    soundWrong.currentTime = 0;
+                    soundWrong.play();
+                    loseLife();
+                }
+            }
+        }, time);
+
+        activeJumpscares.push(() => {
+            clearTimeout(timeoutId);
+            jumpscareStillActive = false; // cancelar jumpscare al limpiar
+            const jsModal = document.getElementById("jumpscareModal");
+            if (jsModal) jsModal.remove();
+        });
+    }
+
+    // Limpiar todos los jumpscares activos
+    function clearJumpscares() {
+        activeJumpscares.forEach(fn => fn());
+        activeJumpscares = [];
+    }
+
+
+
+
+    // 🔄 Cambiar el video de fondo
+    function changeBackgroundVideo(src) {
+        try {
+            bgMusic.pause();
+            videoBg.pause();
+            const sourceEl = videoBg.querySelector('source');
+            if (sourceEl) sourceEl.src = src;
+            else videoBg.src = src;
+            videoBg.load();
+            videoBg.play().catch(err => console.warn('changeBackgroundVideo play:', err));
+
+            // Música de fondo aleatoria
+            if (musicStarted) playRandomMusic();
+
+            // lanzar jumpscares si el step los tiene
+            const step = steps[currentStep];
+            if (step.jumpscares) {
+                step.jumpscares.forEach(time => startJumpscare(step, time));
+            }
+
+        } catch (e) {
+            console.warn('changeBackgroundVideo error:', e);
+        }
+    }
+
+
+    // 🔊 Sonidos al escribir
+    input.addEventListener('keydown', (e) => {
+      if (e.key.length === 1) {
+        const randomSound = bloodSounds[Math.floor(Math.random() * bloodSounds.length)];
+        randomSound.currentTime = 0;
+        randomSound.play();
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        btn.click();
+      }
+    });
+
+    // Forzar foco
+    input.addEventListener('blur', () => {
+      setTimeout(() => input.focus(), 0);
+    });
+
+    // 🎵 Activar música tras la primera interacción del usuario
+    function startMusicOnInteraction() {
+        if (!musicStarted) {
+            musicStarted = true;
+            playRandomMusic();
+        }
+    }
+
+    document.addEventListener('click', startMusicOnInteraction, { once: true });
+    document.addEventListener('keydown', startMusicOnInteraction, { once: true });
+
+</script>
+
+
+
+</body>
+</html>

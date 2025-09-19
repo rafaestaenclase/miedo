@@ -168,8 +168,11 @@
 
         { type: "video", src: "./videos/qr.mp4" },
         { type: "password", code: "34", background: "./backgrounds/qr.mp4"},
+        
 
-        //EXPLICAR BICHO
+        { type: "video", src: "./videos/interferencia.mp4" },
+        { type: "password", code: "", background: "./backgrounds/bicho.mp4"},
+
 
         { type: "video", src: "./videos/interferencia.mp4" },
         { type: "password", code: "34", background: "./backgrounds/yoigo.mp4", jumpscares: [42000, 142000]},
@@ -188,7 +191,7 @@
 
         { type: "password", code: "ganzua", background: "./backgrounds/ganzua.mp4", jumpscares: [62000]},
 
-        { type: "password", code: "fin", background: "./backgrounds/poema.mp4"},
+        { type: "password", code: "resucitar", background: "./backgrounds/poema.mp4"},
 
         { type: "video", src: "./videos/final.mp4" },
 
@@ -225,7 +228,7 @@
     ];
     const bgMusic = new Audio();
     bgMusic.loop = true;
-    bgMusic.volume = 0.4;
+    bgMusic.volume = 0.9;
     bgMusic.preload = "auto";
 
     let musicStarted = false; // Control para iniciar música tras primera interacción
@@ -298,7 +301,6 @@
         bgMusic.pause();
         videoBg.pause();
 
-
         const step = steps[currentStep];
         if (!step) return;
 
@@ -314,7 +316,6 @@
       feedback.textContent = "";
 
       bgMusic.pause();
-      videoBg.pause();
       // Detener música al reproducir video
       if (musicStarted) bgMusic.pause();
 
